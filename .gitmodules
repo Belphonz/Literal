@@ -1,0 +1,3 @@
+[submodule "lib/Arson"]
+	path = lib/Arson
+	url = https://github.com/Belphonz/Arson.git
