@@ -1,0 +1,15 @@
+#Adding Source Files to the SOURCE_FILES Variable
+list(APPEND LIB_SOURCE_FILES src)
+list(APPEND LIB_INCLUDE_FILES "include")
+
+#Create the .lib file
+add_library(Literal ${LIB_SOURCE_FILES} ${LIB_INCLUDE_FILES})
+set_target_properties(Literal PROPERTIES LINKER_LANGUAGE CXX)
+
+target_include_directories(Literal PUBLIC "${CMAKE_CURRENT_LIST_DIR}")
+
+#Add all the header files needed
+	
+
+#Add the Arson Style.h to a Project
+target_include_directories(Literal PUBLIC "${CMAKE_CURRENT_LIST_DIR}/lib/Arson/include")
