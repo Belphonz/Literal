@@ -1,6 +1,6 @@
 ﻿#pragma once				       //makes the compiler only compile the .h file once
 #include <vector>				   //allows the file to attain access the vector class(a dynamic array)
-#include "txt_engine_elements.h"   //allows the file to attain access the txt_engine_elements.h file
+#include "Literal/txt_engine_elements.h"   //allows the file to attain access the txt_engine_elements.h file
 #include "sprite.h"				   //allows the file to attain access to the sprite.h file (to get the class)
 
 

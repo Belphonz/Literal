@@ -1,15 +1,22 @@
 #Adding Source Files to the SOURCE_FILES Variable
-list(APPEND LIB_SOURCE_FILES src)
-list(APPEND LIB_INCLUDE_FILES "include")
+list(APPEND LIB_INCLUDE_FILES "include/Literal/Window.h")
+list(APPEND LIB_INCLUDE_FILES "include/Literal/Vector2.h")
+list(APPEND LIB_INCLUDE_FILES "include/Literal/Alias.h")
+list(APPEND LIB_INCLUDE_FILES "include/Literal/display.h")
+list(APPEND LIB_INCLUDE_FILES "include/Literal/sprite.h")
+
+list(APPEND LIB_SOURCE_FILES src/Window_src.h)
+list(APPEND LIB_SOURCE_FILES src/sprite.cpp)
+list(APPEND LIB_SOURCE_FILES src/display.cpp)
+
 
 #Create the .lib file
-add_library(Literal ${LIB_SOURCE_FILES} ${LIB_INCLUDE_FILES})
+add_library(Literal STATIC ${LIB_SOURCE_FILES} ${LIB_INCLUDE_FILES} )
 set_target_properties(Literal PROPERTIES LINKER_LANGUAGE CXX)
 
-target_include_directories(Literal PUBLIC "${CMAKE_CURRENT_LIST_DIR}")
-
-#Add all the header files needed
+target_include_directories(Literal PUBLIC "${CMAKE_CURRENT_LIST_DIR}/include")
 	
 
-#Add the Arson Style.h to a Project
+#Add Arson to a Project
 target_include_directories(Literal PUBLIC "${CMAKE_CURRENT_LIST_DIR}/lib/Arson/include")
+target_include_directories(Literal PUBLIC "${CMAKE_CURRENT_LIST_DIR}/lib/Arson/src")

@@ -1,5 +1,5 @@
-﻿#include "display.h"
-#include "txt_engine_elements.h"
+﻿#include "Literal/display.h"
+#include "Literal/txt_engine_elements.h"
 
 #include <cstdio>
 #include <fstream>

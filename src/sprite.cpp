@@ -1,5 +1,5 @@
-﻿#include "sprite.h"
-#include "txt_engine_elements.h"
+﻿#include "Literal/sprite.h"
+#include "Literal/txt_engine_elements.h"
 #include <fstream>
 #include <iostream>
 
