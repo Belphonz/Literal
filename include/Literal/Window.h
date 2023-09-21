@@ -27,7 +27,7 @@ namespace Lit
 	public:
 		//Default Constructor
 		//WARNING: Initlizing this class will draw a border in the console which may overwrite preexisting text
-		explicit Window(bool is_console_utf_ = true);
+		explicit Window(bool is_console_utf_ = true, wchar_t custom_border_ = ' ');
 
 		//Clears the Window
 		void clear();

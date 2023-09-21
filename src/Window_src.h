@@ -13,9 +13,14 @@ void Window<Width, Height>::set_cursor_position(Vector2<SHORT> position)
 }
 
 template <size_t Width, size_t Height>
-Window<Width, Height>::Window(const bool is_console_utf_)
+Window<Width, Height>::Window(const bool is_console_utf_, wchar_t custom_border_)
 {
-	if (is_console_utf_) { _setmode(_fileno(stdout), _O_U16TEXT); }
+	if (is_console_utf_)
+	{
+		_setmode(_fileno(stdout), _O_U16TEXT);
+		custom_border_ = win_border;
+
+	}
 
 	set_cursor_position({-1, -1});
 	for (size_t i{0}; i <= Height + 1; ++i)
@@ -25,10 +30,9 @@ Window<Width, Height>::Window(const bool is_console_utf_)
 			if (i == 0 || i == Height + 1
 				|| j == 0 || j == Width + 1)
 			{
-				wprintf(L"%c", win_border);
+				wprintf(L"%c", custom_border_);
 				continue;
 			}
-
 			wprintf(L" ");
 		}
 		wprintf(L"\n");
