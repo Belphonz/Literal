@@ -4,7 +4,7 @@
 
 #include <ostream>
 
-namespace lit
+namespace Lit
 {
 	//General Vector2 struct
 	template <typename T>
