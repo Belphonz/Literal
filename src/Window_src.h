@@ -4,7 +4,13 @@
 #include <fcntl.h>
 #include "Window.h"
 
-template <SHORT Width, SHORT Height>
+template <size_t Width, size_t Height>
+Vector2<SHORT> Window<Width, Height>::get_dimensions()
+{
+	return {Width, Height};
+}
+
+template <size_t Width, size_t Height>
 void Window<Width, Height>::set_cursor_position_in_window(Vector2<SHORT> position) const
 {
 	std::wcout.flush();
@@ -13,7 +19,7 @@ void Window<Width, Height>::set_cursor_position_in_window(Vector2<SHORT> positio
 	SetConsoleCursorPosition(CMD_OUTPUT_OBJ_HANDLE, coordinates);
 }
 
-template <SHORT Width, SHORT Height>
+template <size_t Width, size_t Height>
 void Window<Width, Height>::set_cursor_position_abs(const Vector2<SHORT> position) const
 {
 	std::wcout.flush();
@@ -21,7 +27,7 @@ void Window<Width, Height>::set_cursor_position_abs(const Vector2<SHORT> positio
 	SetConsoleCursorPosition(CMD_OUTPUT_OBJ_HANDLE, coordinates);
 }
 
-template <SHORT Width, SHORT Height>
+template <size_t Width, size_t Height>
 Vector2<SHORT> Window<Width, Height>::get_cursor_position_in_window()
 {
 	std::wcout.flush();
@@ -30,7 +36,7 @@ Vector2<SHORT> Window<Width, Height>::get_cursor_position_in_window()
 	return {--CMD_BUFFER_DATA.dwCursorPosition.X, --CMD_BUFFER_DATA.dwCursorPosition.Y};
 }
 
-template <SHORT Width, SHORT Height>
+template <size_t Width, size_t Height>
 Vector2<SHORT> Window<Width, Height>::get_cursor_position_abs()
 {
 	std::wcout.flush();
@@ -39,12 +45,19 @@ Vector2<SHORT> Window<Width, Height>::get_cursor_position_abs()
 	return {CMD_BUFFER_DATA.dwCursorPosition.X, CMD_BUFFER_DATA.dwCursorPosition.Y};
 }
 
-template <SHORT Width, SHORT Height>
-void Window<Width, Height>::draw_window_border()
+template <size_t Width, size_t Height>
+char* Window<Width, Height>::data()
 {
+	return _win_data.data();
+}
+
+template <size_t Width, size_t Height>
+void Window<Width, Height>::draw_window_border(const wchar_t border)
+{
+	set_cursor_position_abs({0, 0});
 	for (size_t index{0}; index <= Width + 1; ++index)
 	{
-		std::wcout.write(&WIN_BORDER, 1);
+		std::wcout.write(&border, 1);
 	}
 	std::wcout.write(L"\n", 1);
 	for (size_t delta_index{0}; delta_index <= 2 * Height; ++delta_index)
@@ -52,31 +65,31 @@ void Window<Width, Height>::draw_window_border()
 		//Print the Border on One side than jump to the Other Side
 		if (delta_index % 2 == 0)
 		{
-			std::wcout.write(&WIN_BORDER, 1);
+			std::wcout.write(&border, 1);
 			set_cursor_position_abs({Width + 1, get_cursor_position_abs().y});
 		}
 		else
 		{
-			std::wcout.write(&WIN_BORDER, 1);
+			std::wcout.write(&border, 1);
 			std::wcout.write(L"\n", 1);
 		}
 	}
 	set_cursor_position_abs({0, get_cursor_position_abs().y});
 	for (size_t index{0}; index <= Width + 1; ++index)
 	{
-		std::wcout.write(&WIN_BORDER, 1);
+		std::wcout.write(&border, 1);
 	}
 	std::wcout.write(L"\n", 1);
 }
 
-template <SHORT Width, SHORT Height>
+template <size_t Width, size_t Height>
 void Window<Width, Height>::init_console()
 {
 	//Corrector Exists so that 1x1 squares can work correctly
 	constexpr int size_corrector{7};
 	Vector2<int> cmd_dimensions_px = {
-		(Width + size_corrector) * (CMD_CHAR_DATA.dwFontSize.Y / 2 + 1),
-		(Height + size_corrector) * CMD_CHAR_DATA.dwFontSize.Y
+		static_cast<int>(Width + size_corrector) * (CMD_CHAR_DATA.dwFontSize.Y / 2 + 1),
+		static_cast<int>(Height + size_corrector) * CMD_CHAR_DATA.dwFontSize.Y
 	};
 
 	const HDC CMD_GRAPHICS_HANDLER = GetDC(CMD_HANDLE);
@@ -117,7 +130,7 @@ void Window<Width, Height>::init_console()
 	SetWindowPos(CMD_HANDLE, nullptr, middle_pos.x, middle_pos.y, 0, 0, SWP_NOSIZE | SWP_NOZORDER);
 }
 
-template <SHORT Width, SHORT Height>
+template <size_t Width, size_t Height>
 Window<Width, Height>::Window(const bool is_console_utf_, wchar_t custom_border_)
 {
 	//Initilizes the Console variables
@@ -128,31 +141,36 @@ Window<Width, Height>::Window(const bool is_console_utf_, wchar_t custom_border_
 	if (is_console_utf_)
 	{
 		_setmode(_fileno(stdout), _O_U16TEXT);
-		custom_border_ = WIN_BORDER;
 	}
+	custom_border_ = WIN_BORDER;
 	init_console();
-	draw_window_border();
+	draw_window_border(custom_border_);
 }
 
-template <SHORT Width, SHORT Height>
+template <size_t Width, size_t Height>
 void Window<Width, Height>::clear()
 {
-	_win_data.data() = {};
+	std::fill_n(_win_data.data(), _win_data.max_size() / 2, ' ');
 }
 
 
-template <SHORT Width, SHORT Height>
+
+template <size_t Width, size_t Height>
 void Window<Width, Height>::fill(wchar_t character)
 {
-	std::fill_n(_win_data.data(), _win_data.max_size(), character);
+	std::fill_n(_win_data.data(), _win_data.max_size() / 2, character);
 }
 
-template <SHORT Width, SHORT Height>
-void Window<Width, Height>::fill(wchar_t character, Vector2<size_t> top_left, Vector2<size_t> bottom_right)
+template <size_t Width, size_t Height>
+void Window<Width, Height>::fill(wchar_t character, const Vector2<size_t> top_left, const Vector2<size_t> bottom_right)
 {
+	for (size_t height{0}; height < bottom_right.y - top_left.y; ++height)
+	{
+		std::fill_n(&_win_data.at({top_left.x, top_left.y + height}), bottom_right.x - top_left.x, character);
+	}
 }
 
-template <SHORT Width, SHORT Height>
+template <size_t Width, size_t Height>
 void Window<Width, Height>::clear_cmd()
 {
 	constexpr COORD top_left = {0, 0};
@@ -169,9 +187,24 @@ void Window<Width, Height>::clear_cmd()
 	SetConsoleCursorPosition(CMD_OUTPUT_OBJ_HANDLE, top_left);
 }
 
-template <SHORT Width, SHORT Height>
+template <size_t Width, size_t Height>
 void Window<Width, Height>::display()
 {
+	for (size_t y{0}; y < Height; ++y)
+	{
+		for (size_t x{0}; x < Width; ++x)
+		{
+			//Treating latter half of the array as a 2nd buffer, to reduce print calls
+			if (_win_data.at({x, y}) == _win_data.at({x, Height + y}))
+			{
+				continue;
+			}
+			set_cursor_position_in_window({static_cast<short>(x), static_cast<short>(y)});
+			std::wcout.write(&_win_data.at({x, y}), 1);
+		}
+	}
+	std::wmemmove(&_win_data.at({0,Height}), &_win_data.at({0,0}), _win_data.max_size() / 2);
+	set_cursor_position_abs({0, Height + 3});
 }
 
 
