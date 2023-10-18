@@ -2,10 +2,10 @@
 #define LITERAL_CLASS_WINDOW_SCR_H
 
 #include <fcntl.h>
-#include "Window.h"
+#include <Windows.h>
 
 template <size_t Width, size_t Height>
-Vector2<SHORT> Window<Width, Height>::get_dimensions()
+Vector2<size_t> Window<Width, Height>::get_dimensions()
 {
 	return {Width, Height};
 }
@@ -138,6 +138,7 @@ Window<Width, Height>::Window(const bool is_console_utf_, wchar_t custom_border_
 	GetWindowRect(DESKTOP_WIN_HANDLE, &DESKTOP_WIN_RECT);
 	GetCurrentConsoleFontEx(CMD_OUTPUT_OBJ_HANDLE, FALSE, &CMD_CHAR_DATA);
 
+	std::fill_n(_win_data.data(), _win_data.max_size(), ' ');
 	if (is_console_utf_)
 	{
 		_setmode(_fileno(stdout), _O_U16TEXT);
@@ -148,11 +149,16 @@ Window<Width, Height>::Window(const bool is_console_utf_, wchar_t custom_border_
 }
 
 template <size_t Width, size_t Height>
+void Window<Width, Height>::set_framerate_limit(const size_t limit)
+{
+	_fps_limit = limit;
+}
+
+template <size_t Width, size_t Height>
 void Window<Width, Height>::clear()
 {
 	std::fill_n(_win_data.data(), _win_data.max_size() / 2, ' ');
 }
-
 
 
 template <size_t Width, size_t Height>
@@ -190,6 +196,17 @@ void Window<Width, Height>::clear_cmd()
 template <size_t Width, size_t Height>
 void Window<Width, Height>::display()
 {
+	const float current_time = _internal_clock.get_elapsed_time().as_seconds();
+	const float fps_frequency = 1 / static_cast<float>(_fps_limit);
+	const float pure_duration_milliseconds = fps_frequency - current_time;
+	const float pure_duration = pure_duration_milliseconds * 1000;
+	const int duration = static_cast<int>(pure_duration);
+	const DWORD duration_dword = static_cast<DWORD>(duration);
+
+	if (_fps_limit && current_time < fps_frequency)
+	{
+		Sleep(duration_dword);
+	}
 	for (size_t y{0}; y < Height; ++y)
 	{
 		for (size_t x{0}; x < Width; ++x)
@@ -203,8 +220,9 @@ void Window<Width, Height>::display()
 			std::wcout.write(&_win_data.at({x, y}), 1);
 		}
 	}
-	std::wmemmove(&_win_data.at({0,Height}), &_win_data.at({0,0}), _win_data.max_size() / 2);
+	std::wmemmove(&_win_data.at({0, Height}), &_win_data.at({0, 0}), _win_data.max_size() / 2);
 	set_cursor_position_abs({0, Height + 3});
+	_internal_clock.restart();
 }
 
 
