@@ -17,9 +17,9 @@ namespace txt_engine //namespace containing all the in_built features of the Tex
 	public:
 		//constructors for the class 'sprite'
 		explicit sprite(const std::string& text, bool is_text = false, char background = '\0');
-		explicit sprite(const std::string& text, vector2 initial_position = {0, 0}, bool is_text = false,
-		                char background = '\0');
-		explicit sprite(image base_image, vector2 initial_position = {0, 0});
+		explicit sprite(const std::string& text, vector2 initial_position = { 0, 0 }, bool is_text = false,
+			char background = '\0');
+		explicit sprite(image base_image, vector2 initial_position = { 0, 0 });
 
 		//changes the sprite image to the sprite stored in the .txt file passed as an argument,
 		void set_file_as_image(const std::string& filename);
@@ -34,7 +34,7 @@ namespace txt_engine //namespace containing all the in_built features of the Tex
 		//changes the image background
 		//(the image background will not be chritted onto the display/screen)
 		void set_image_background_chr(char background_chr);
-		//adds a phrase to the center of the sprite 
+		//adds a phrase to the center of the sprite
 		void add_label(const std::string& label);
 		//returns the image(variable type) of the sprite
 		image get_image();
@@ -46,7 +46,7 @@ namespace txt_engine //namespace containing all the in_built features of the Tex
 		int get_image_surface_area() const;
 		//returns the image background character
 		char get_image_background_chr() const;
-		//returns the current image position 
+		//returns the current image position
 		vector2 get_image_position() const;
 	};
 }

@@ -8,7 +8,7 @@ namespace Lit
 	//Object that stores time
 	class Time
 	{
-		std::chrono::time_point<std::chrono::steady_clock> _stored_time{std::chrono::steady_clock::now()};
+		std::chrono::time_point<std::chrono::steady_clock> _stored_time{ std::chrono::steady_clock::now() };
 
 	public:
 		Time() = default;
