@@ -7,6 +7,7 @@
 #include "Arson/Struct_Common.h"
 #include "Arson/Tensor2D.h"
 #include "Literal/Timer.h"
+#include "Literal/Rect.h"
 #include "Literal/WindowSettings.h"
 
 namespace Lit
@@ -63,11 +64,17 @@ namespace Lit
 		//Get the Cursor Position on the Console
 		Arn::Vector2<SHORT> get_cursor_position_abs();
 		//Get Raw Window Array
-		wchar_t* data();
+		const Arn::Tensor2D<wchar_t>& data();
+		//Get Primitive Raw Window Array
+		wchar_t* rawdata();
 		//Get WindowSettings
-		void SetSettings(WindowSettings new_configuration);
+		void set_settings(WindowSettings new_configuration);
 		//Get WindowSettings
-		WindowSettings GetSettings() const;
+		const WindowSettings& get_settings() const;
+		//Sets a new View position (camera)
+		void set_view_position(Arn::Vector2<int> new_view_pos);
+		//Gets View position (camera)
+		Arn::Vector2<int> get_view_position() const;
 
 		//Clears the Window
 		void clear();
@@ -75,8 +82,12 @@ namespace Lit
 		void fill(wchar_t character);
 		//Fill a part of the window with a char
 		void fill(wchar_t character, Arn::Vector2<size_t> top_left, Arn::Vector2<size_t> bottom_right);
+		//Fill a part of the window with a char
+		void fill(wchar_t character, Lit::Rect<size_t> rect);
 		//Clear the console
 		void clear_cmd();
+		//Displaces the View position (camera) by offset
+		void move(Arn::Vector2<int> offset);
 		//Display what has been drawn onto the Window
 		void display();
 	};

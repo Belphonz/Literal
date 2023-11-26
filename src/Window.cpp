@@ -39,21 +39,36 @@ Arn::Vector2<SHORT> Lit::Window::get_cursor_position_abs()
 	return { CMD_BUFFER_DATA.dwCursorPosition.X, CMD_BUFFER_DATA.dwCursorPosition.Y };
 }
 
-wchar_t* Lit::Window::data()
+const Arn::Tensor2D<wchar_t>& Lit::Window::data()
+{
+	return _win_data;
+}
+
+wchar_t* Lit::Window::rawdata()
 {
 	return _win_data.data();
 }
 
-void Lit::Window::SetSettings(WindowSettings new_configuration)
+void Lit::Window::set_settings(WindowSettings new_configuration)
 {
 	_current_settings = new_configuration;
 	SetWindowLongPtr(GetConsoleWindow(), GWL_STYLE, new_configuration.WIN_STYLE);
 	SetConsoleTitleW(new_configuration.WIN_TITLE);
 }
 
-Lit::WindowSettings Lit::Window::GetSettings()	const
+const Lit::WindowSettings& Lit::Window::get_settings()	const
 {
 	return _current_settings;
+}
+
+void Lit::Window::set_view_position(Arn::Vector2<int> new_view_pos)
+{
+	_view_pos = new_view_pos;
+}
+
+Arn::Vector2<int> Lit::Window::get_view_position() const
+{
+	return _view_pos;
 }
 
 void Lit::Window::draw_window_border(const wchar_t border)
@@ -179,6 +194,14 @@ void Lit::Window::fill(const wchar_t character,
 	}
 }
 
+void Lit::Window::fill(wchar_t character, Lit::Rect<size_t> rect)
+{
+	for (size_t height{ 0 }; height < rect.height - rect.top; ++height)
+	{
+		std::fill_n(&_win_data.at({ rect.left, rect.top + height }), rect.width - rect.left, character);
+	}
+}
+
 void Lit::Window::clear_cmd()
 {
 	constexpr COORD top_left = { 0, 0 };
@@ -193,6 +216,12 @@ void Lit::Window::clear_cmd()
 		CMD_BUFFER_DATA.dwSize.X * CMD_BUFFER_DATA.dwSize.Y, top_left, &written
 	);
 	SetConsoleCursorPosition(CMD_OUTPUT_OBJ_HANDLE, top_left);
+}
+
+void Lit::Window::move(Arn::Vector2<int> offset)
+{
+	_view_pos = { _view_pos.x + offset.x,
+				  _view_pos.y + offset.y };
 }
 
 void Lit::Window::display()

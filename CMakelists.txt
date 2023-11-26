@@ -4,9 +4,11 @@ list(APPEND LIB_INCLUDE_FILES "include/Literal/Drawable.h")
 list(APPEND LIB_INCLUDE_FILES "include/Literal/Timer.h")
 list(APPEND LIB_INCLUDE_FILES "include/Literal/Time.h")
 list(APPEND LIB_INCLUDE_FILES "include/Literal/WindowSettings.h")
+list(APPEND LIB_INCLUDE_FILES "include/Literal/Rect.h")
 
 
 list(APPEND LIB_SOURCE_FILES src/Window.cpp)
+list(APPEND LIB_SOURCE_FILES src/Drawable.cpp)
 list(APPEND LIB_SOURCE_FILES src/Timer.cpp)
 list(APPEND LIB_SOURCE_FILES src/Time.cpp)
 
