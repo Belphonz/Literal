@@ -3,14 +3,14 @@
 #include "Literal/Drawable.h"
 #include <iostream>
 
-Lit::Drawable::Drawable(Arn::Vector2<size_t> size, Arn::Vector2<int> posistion) :
+Lit::Drawable::Drawable(Arn::Vector2<size_t> size, Arn::Vector2<float> posistion) :
 	_size{ size },
 	_pos{ posistion }
 {
 	_display_rect = { {0,0},{_size} };
 }
 
-Lit::Drawable::Drawable(const std::string& filepath, Arn::Vector2<size_t> size, Arn::Vector2<int> posistion) :
+Lit::Drawable::Drawable(const std::string& filepath, Arn::Vector2<size_t> size, Arn::Vector2<float> posistion) :
 	_size{ size },
 	_pos{ posistion }
 {
@@ -80,12 +80,12 @@ void Lit::Drawable::set_drawable(const std::string& filepath)
 	in_stream.close();
 }
 
-Arn::Vector2<int> Lit::Drawable::position() const
+Arn::Vector2<float> Lit::Drawable::position() const
 {
 	return _pos;
 }
 
-void Lit::Drawable::set_position(Arn::Vector2<int> new_pos)
+void Lit::Drawable::set_position(Arn::Vector2<float> new_pos)
 {
 	_pos = new_pos;
 }
@@ -122,7 +122,7 @@ wchar_t* Lit::Drawable::rawdata()
 	return _draw_data.data();
 }
 
-void Lit::Drawable::move(Arn::Vector2<int> offset)
+void Lit::Drawable::move(Arn::Vector2<float> offset)
 {
 	_pos = { _pos.x + offset.x,
 			 _pos.y + offset.y };

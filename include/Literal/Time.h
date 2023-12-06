@@ -20,7 +20,6 @@ namespace Lit
 		[[nodiscard]] size_t as_microseconds() const;
 
 		Time& operator -=(Time right);
-		friend class Timer;
 		friend Time operator -(Time left, Time right);
 	};
 

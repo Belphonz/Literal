@@ -6,6 +6,7 @@
 
 #include "Arson/Struct_Common.h"
 #include "Arson/Tensor2D.h"
+#include "Literal/Drawable.h"
 #include "Literal/Timer.h"
 #include "Literal/Rect.h"
 #include "Literal/WindowSettings.h"
@@ -32,7 +33,7 @@ namespace Lit
 		void init_console();
 
 		//Holds the current view position of the top left char
-		Arn::Vector2<int> _view_pos{ 0, 0 };
+		Arn::Vector2<float> _view_pos{ 0, 0 };
 
 	private:
 		//Window console variables
@@ -72,9 +73,9 @@ namespace Lit
 		//Get WindowSettings
 		const WindowSettings& get_settings() const;
 		//Sets a new View position (camera)
-		void set_view_position(Arn::Vector2<int> new_view_pos);
+		void set_view_position(Arn::Vector2<float> new_view_pos);
 		//Gets View position (camera)
-		Arn::Vector2<int> get_view_position() const;
+		Arn::Vector2<float> get_view_position() const;
 
 		//Clears the Window
 		void clear();
@@ -87,7 +88,9 @@ namespace Lit
 		//Clear the console
 		void clear_cmd();
 		//Displaces the View position (camera) by offset
-		void move(Arn::Vector2<int> offset);
+		void move(Arn::Vector2<float> offset);
+		//Draws a drawable onto the Window
+		void draw(Drawable& drawable);
 		//Display what has been drawn onto the Window
 		void display();
 	};

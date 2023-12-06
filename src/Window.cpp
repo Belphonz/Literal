@@ -61,12 +61,12 @@ const Lit::WindowSettings& Lit::Window::get_settings()	const
 	return _current_settings;
 }
 
-void Lit::Window::set_view_position(Arn::Vector2<int> new_view_pos)
+void Lit::Window::set_view_position(Arn::Vector2<float> new_view_pos)
 {
 	_view_pos = new_view_pos;
 }
 
-Arn::Vector2<int> Lit::Window::get_view_position() const
+Arn::Vector2<float> Lit::Window::get_view_position() const
 {
 	return _view_pos;
 }
@@ -76,29 +76,29 @@ void Lit::Window::draw_window_border(const wchar_t border)
 	set_cursor_position_abs({ 0, 0 });
 	for (size_t index{ 0 }; index <= WIDTH + 1; ++index)
 	{
-		std::wcout.write(&border, 1);
+		fwrite(&border, sizeof(wchar_t), 1, stdout);
 	}
-	std::wcout.write(L"\n", 1);
+	fwrite(L"\n", sizeof(wchar_t), 1, stdout);
 	for (size_t delta_index{ 0 }; delta_index <= 2 * HEIGHT; ++delta_index)
 	{
 		//Print the Border on One side than jump to the Other Side
 		if (delta_index % 2 == 0)
 		{
-			std::wcout.write(&border, 1);
+			fwrite(&border, sizeof(wchar_t), 1, stdout);
 			set_cursor_position_abs({ static_cast<short>(WIDTH + 1), get_cursor_position_abs().y });
 		}
 		else
 		{
-			std::wcout.write(&border, 1);
-			std::wcout.write(L"\n", 1);
+			fwrite(&border, sizeof(wchar_t), 1, stdout);
+			fwrite(L"\n", sizeof(wchar_t), 1, stdout);
 		}
 	}
 	set_cursor_position_abs({ 0, get_cursor_position_abs().y });
 	for (size_t index{ 0 }; index <= WIDTH + 1; ++index)
 	{
-		std::wcout.write(&border, 1);
+		fwrite(&border, sizeof(wchar_t), 1, stdout);
 	}
-	std::wcout.write(L"\n", 1);
+	fwrite(L"\n", sizeof(wchar_t), 1, stdout);
 }
 
 void Lit::Window::init_console()
@@ -218,10 +218,59 @@ void Lit::Window::clear_cmd()
 	SetConsoleCursorPosition(CMD_OUTPUT_OBJ_HANDLE, top_left);
 }
 
-void Lit::Window::move(Arn::Vector2<int> offset)
+void Lit::Window::move(Arn::Vector2<float> offset)
 {
 	_view_pos = { _view_pos.x + offset.x,
 				  _view_pos.y + offset.y };
+}
+
+void Lit::Window::draw(Drawable& drawable)
+{
+	Arn::Vector2<int> cast_drawable_pos{ floor(drawable._pos.x),floor(drawable._pos.y) };
+	Arn::Vector2<int> cast_view_pos{ floor(_view_pos.x),floor(_view_pos.y) };
+	if (cast_drawable_pos.x >= cast_view_pos.x + static_cast<int>(WIDTH)
+		|| cast_drawable_pos.y >= cast_view_pos.y + static_cast<int>(HEIGHT)
+		|| cast_drawable_pos.x + static_cast<int>(drawable._display_rect.width) <= cast_view_pos.x
+		|| cast_drawable_pos.y + static_cast<int>(drawable._display_rect.height) <= cast_view_pos.y)
+	{
+		return;
+	}
+
+	size_t new_size_y{
+		cast_drawable_pos.y + static_cast<int>(drawable._display_rect.height) > cast_drawable_pos.y + static_cast<int>(HEIGHT) ?
+		(cast_view_pos.y + static_cast<int>(HEIGHT)) - cast_drawable_pos.y :
+		drawable._display_rect.height };
+
+	size_t new_size_x{
+	   drawable._pos.x + static_cast<int>(drawable._display_rect.width) > cast_view_pos.x + static_cast<int>(WIDTH) ?
+	   (cast_view_pos.x + static_cast<int>(WIDTH)) - cast_drawable_pos.x :
+	   drawable._display_rect.width };
+
+	size_t begin_drawing_x{
+		cast_view_pos.x > cast_drawable_pos.x ?
+		static_cast<size_t>(cast_view_pos.x) - cast_drawable_pos.x :
+		0 };
+
+	size_t begin_drawing_y{
+		cast_view_pos.y > cast_drawable_pos.y ?
+		static_cast<size_t>(cast_view_pos.y) - cast_drawable_pos.y :
+		0 };
+
+	size_t abs_pos_x{ cast_view_pos.x > cast_drawable_pos.x ?
+		0 :
+		static_cast<size_t>(cast_drawable_pos.x) - cast_view_pos.x };
+
+	size_t abs_pos_y{ cast_view_pos.y > cast_drawable_pos.y ?
+		0 :
+		static_cast<size_t>(cast_drawable_pos.y) - cast_view_pos.y };
+
+	for (size_t y{ begin_drawing_y }, index{ 0 }; y < new_size_y; ++y, ++index) {
+		// x2 because memcpy copies in bytes and wchar is 2 bytes
+		std::memcpy(
+			&_win_data.at({ abs_pos_x, abs_pos_y + index }),
+			&drawable._draw_data.at({ drawable._display_rect.left + begin_drawing_x ,y }),
+			(new_size_x - begin_drawing_x) * sizeof(wchar_t));
+	}
 }
 
 void Lit::Window::display()
@@ -247,7 +296,7 @@ void Lit::Window::display()
 				continue;
 			}
 			set_cursor_position_in_window({ static_cast<short>(x), static_cast<short>(y) });
-			std::wcout.write(&_win_data.at({ x, y }), 1);
+			fwrite(&_win_data.at({ x, y }), sizeof(wchar_t), 1, stdout);
 		}
 	}
 	std::wmemmove(&_win_data.at({ 0, HEIGHT }), &_win_data.at({ 0, 0 }), _win_data.max_size() / 2);

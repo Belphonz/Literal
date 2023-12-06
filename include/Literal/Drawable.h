@@ -17,14 +17,16 @@ namespace Lit
 		//Holds the rectangle which is displayed onto the Window
 		Lit::Rect<size_t> _display_rect{};
 		//Holds the current view position of the top left char
-		Arn::Vector2<int> _pos{ 0, 0 };
+		Arn::Vector2<float> _pos{ 0, 0 };
 		//Main Array storing the Drawable
 		Arn::Tensor2D<wchar_t> _draw_data{ {_size.x,_size.y} };
+
+		friend class Window;
 	public:
-		Drawable(Arn::Vector2<size_t> size, Arn::Vector2<int> posistion = { 0,0 });
+		Drawable(Arn::Vector2<size_t> size, Arn::Vector2<float> posistion = { 0,0 });
 		Drawable(const std::string& filepath,
 			Arn::Vector2<size_t> size,
-			Arn::Vector2<int> posistion = { 0,0 });
+			Arn::Vector2<float> posistion = { 0,0 });
 		//Copy Constructor
 		Drawable(const Drawable& delta_drawable);
 		//Move Constructor
@@ -39,9 +41,9 @@ namespace Lit
 		//Sets the contents of a txt file as the draw_data
 		void set_drawable(const std::string& filepath);
 		//Gets Drawables Position
-		Arn::Vector2<int> position() const;
+		Arn::Vector2<float> position() const;
 		//Sets Drawables Position
-		void set_position(Arn::Vector2<int> new_pos);
+		void set_position(Arn::Vector2<float> new_pos);
 		//Gets Drawables Size
 		Arn::Vector2<size_t> size() const;
 		//Sets Drawables Size
@@ -60,7 +62,7 @@ namespace Lit
 		wchar_t* rawdata();
 
 		//Displaces the position by offset
-		void move(Arn::Vector2<int> offset);
+		void move(Arn::Vector2<float> offset);
 		//Fill the drawable with a char
 		void fill(wchar_t character);
 		//Fill a part of the drawable with a char
