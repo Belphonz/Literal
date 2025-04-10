@@ -1,13 +1,13 @@
 #include "Literal/Timer.h"
 
-Lit::Time Lit::Timer::get_elapsed_time() const
+Lit::Time Lit::Timer::GetElapsedTime() const
 {
-	return Time() - _start_time;
+	return Time() - _startTime;
 }
 
-Lit::Time Lit::Timer::restart()
+Lit::Time Lit::Timer::Restart()
 {
-	const Time elapsed_time = Time() - _start_time;
-	_start_time = Time();
+	const Time elapsed_time = Time() - _startTime;
+	_startTime = Time();
 	return elapsed_time;
 }

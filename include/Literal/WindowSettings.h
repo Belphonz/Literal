@@ -2,12 +2,13 @@
 #define LITERAL_STRUCT_WINDOW_SETTINGS_H
 
 #include <Windows.h>
-#include "Arson/Style.h"
+#include <Arson/Common.h>
 
 namespace Lit
 {
 	//Enum Holding the Possible window styles
-	enum WindowStyles : long {
+	enum WindowStyles : long 
+	{
 		DEFAULT = 351207424L,
 		RESIZABLE = WS_SIZEBOX,
 		TITLE_BAR = WS_SYSMENU | WS_CAPTION,

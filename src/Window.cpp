@@ -1,14 +1,15 @@
 #include <fcntl.h>
 #include <io.h>
+#include <stdio.h>
 
-#include "Literal/Window.h"
+#include <Literal/Window.h>
 
-Arn::Vector2<size_t> Lit::Window::get_dimensions() const
+Arn::Vector2<size_t> Lit::Window::GetDimensions() const
 {
-	return { WIDTH, HEIGHT };
+	return { _width, _height };
 }
 
-void Lit::Window::set_cursor_position_in_window(Arn::Vector2<SHORT> position) const
+void Lit::Window::SetCursorPos(Arn::Vector2<SHORT> position) const
 {
 	std::wcout.flush();
 	//Correction for the screen border
@@ -16,14 +17,14 @@ void Lit::Window::set_cursor_position_in_window(Arn::Vector2<SHORT> position) co
 	SetConsoleCursorPosition(CMD_OUTPUT_OBJ_HANDLE, coordinates);
 }
 
-void Lit::Window::set_cursor_position_abs(const Arn::Vector2<SHORT> position) const
+void Lit::Window::SetCursorAbsPos(const Arn::Vector2<SHORT> position) const
 {
 	std::wcout.flush();
 	const COORD coordinates = { position.x, position.y };
 	SetConsoleCursorPosition(CMD_OUTPUT_OBJ_HANDLE, coordinates);
 }
 
-Arn::Vector2<SHORT> Lit::Window::get_cursor_position_in_window()
+Arn::Vector2<SHORT> Lit::Window::GetCursorPos()
 {
 	std::wcout.flush();
 	GetConsoleScreenBufferInfo(CMD_OUTPUT_OBJ_HANDLE, &CMD_BUFFER_DATA);
@@ -31,7 +32,7 @@ Arn::Vector2<SHORT> Lit::Window::get_cursor_position_in_window()
 	return { --CMD_BUFFER_DATA.dwCursorPosition.X, --CMD_BUFFER_DATA.dwCursorPosition.Y };
 }
 
-Arn::Vector2<SHORT> Lit::Window::get_cursor_position_abs()
+Arn::Vector2<SHORT> Lit::Window::GetCursorAbsPos()
 {
 	std::wcout.flush();
 	GetConsoleScreenBufferInfo(CMD_OUTPUT_OBJ_HANDLE, &CMD_BUFFER_DATA);
@@ -39,75 +40,77 @@ Arn::Vector2<SHORT> Lit::Window::get_cursor_position_abs()
 	return { CMD_BUFFER_DATA.dwCursorPosition.X, CMD_BUFFER_DATA.dwCursorPosition.Y };
 }
 
-const Arn::Tensor2D<wchar_t>& Lit::Window::data()
+const Arn::Tensor2DVector<wchar_t>& Lit::Window::Data()
 {
-	return _win_data;
+	return _winData;
 }
 
-wchar_t* Lit::Window::rawdata()
+wchar_t* Lit::Window::RawData()
 {
-	return _win_data.data();
+	return _winData.Data();
 }
 
-void Lit::Window::set_settings(WindowSettings new_configuration)
+void Lit::Window::SetSettings(WindowSettings newConfiguration)
 {
-	_current_settings = new_configuration;
-	SetWindowLongPtr(GetConsoleWindow(), GWL_STYLE, new_configuration.WIN_STYLE);
-	SetConsoleTitleW(new_configuration.WIN_TITLE);
+	_currentSettings = newConfiguration;
+	SetWindowLongPtr(GetConsoleWindow(), GWL_STYLE, newConfiguration.WIN_STYLE);
+	SetConsoleTitleW(newConfiguration.WIN_TITLE);
 }
 
-const Lit::WindowSettings& Lit::Window::get_settings()	const
+const Lit::WindowSettings& Lit::Window::GetSettings()	const
 {
-	return _current_settings;
+	return _currentSettings;
 }
 
-void Lit::Window::set_view_position(Arn::Vector2<float> new_view_pos)
+void Lit::Window::SetViewPos(Arn::Vector2<float> newViewPos)
 {
-	_view_pos = new_view_pos;
+	_viewPos = newViewPos;
 }
 
-Arn::Vector2<float> Lit::Window::get_view_position() const
+Arn::Vector2<float> Lit::Window::GetViewPos() const
 {
-	return _view_pos;
+	return _viewPos;
 }
 
-void Lit::Window::draw_window_border(const wchar_t border)
+void Lit::Window::_DrawWindowBorder(const wchar_t border)
 {
-	set_cursor_position_abs({ 0, 0 });
-	for (size_t index{ 0 }; index <= WIDTH + 1; ++index)
+	SetCursorAbsPos({ 0, 0 });
+	for (size_t i{ 0 }; i <= _width + 1; ++i)
 	{
-		fwrite(&border, sizeof(wchar_t), 1, stdout);
+		std::fwrite(&border, sizeof(wchar_t), 1, stdout);
 	}
-	fwrite(L"\n", sizeof(wchar_t), 1, stdout);
-	for (size_t delta_index{ 0 }; delta_index <= 2 * HEIGHT; ++delta_index)
+	std::fwrite(L"\n", sizeof(wchar_t), 1, stdout);
+
+	for (size_t i{ 0 }; i <= 2 * _height; ++i)
 	{
 		//Print the Border on One side than jump to the Other Side
-		if (delta_index % 2 == 0)
+		if (i % 2 == 0)
 		{
-			fwrite(&border, sizeof(wchar_t), 1, stdout);
-			set_cursor_position_abs({ static_cast<short>(WIDTH + 1), get_cursor_position_abs().y });
+			std::fwrite(&border, sizeof(wchar_t), 1, stdout);
+			SetCursorAbsPos({ static_cast<short>(_width + 1), GetCursorAbsPos().y });
 		}
 		else
 		{
-			fwrite(&border, sizeof(wchar_t), 1, stdout);
-			fwrite(L"\n", sizeof(wchar_t), 1, stdout);
+			std::fwrite(&border, sizeof(wchar_t), 1, stdout);
+			std::fwrite(L"\n", sizeof(wchar_t), 1, stdout);
 		}
 	}
-	set_cursor_position_abs({ 0, get_cursor_position_abs().y });
-	for (size_t index{ 0 }; index <= WIDTH + 1; ++index)
+	SetCursorAbsPos({ 0, GetCursorAbsPos().y });
+
+	for (size_t i{ 0 }; i <= _width + 1; ++i)
 	{
-		fwrite(&border, sizeof(wchar_t), 1, stdout);
+		std::fwrite(&border, sizeof(wchar_t), 1, stdout);
 	}
-	fwrite(L"\n", sizeof(wchar_t), 1, stdout);
+	std::fwrite(L"\n", sizeof(wchar_t), 1, stdout);
 }
 
-void Lit::Window::init_console()
+void Lit::Window::_InitConsole()
 {
 	//Corrector Exists so that 1x1 squares can work correctly
 	constexpr int size_corrector{ 7 };
 	Arn::Vector2<int> cmd_dimensions_px = {
-		static_cast<int>(WIDTH + size_corrector) * (CMD_CHAR_DATA.dwFontSize.Y / 2 + 1),
-		static_cast<int>(HEIGHT + size_corrector) * CMD_CHAR_DATA.dwFontSize.Y
+		static_cast<int>(_width + size_corrector) * (CMD_CHAR_DATA.dwFontSize.Y / 2 + 1),
+		static_cast<int>(_height + size_corrector) * CMD_CHAR_DATA.dwFontSize.Y
 	};
 
 	const HDC CMD_GRAPHICS_HANDLER = GetDC(CMD_HANDLE);
@@ -148,61 +151,61 @@ void Lit::Window::init_console()
 	SetWindowPos(CMD_HANDLE, nullptr, middle_pos.x, middle_pos.y, 0, 0, SWP_NOSIZE | SWP_NOZORDER);
 }
 
-Lit::Window::Window(Arn::Vector2<size_t> dimensions, WindowSettings configuragation, bool is_console_utf_) :
-	WIDTH{ dimensions.x }, HEIGHT{ dimensions.y }
+Lit::Window::Window(Arn::Vector2<size_t> dimensions, WindowSettings configuragation, bool isConsolUtf) :
+	_width{ dimensions.x }, _height{ dimensions.y }
 {
 	//Sets the Console Style
-	SetWindowLongPtr(GetConsoleWindow(), GWL_STYLE, configuragation.WIN_STYLE);
+	SetWindowLongPtr(CMD_HANDLE, GWL_STYLE, configuragation.WIN_STYLE);
 	SetConsoleTitleW(configuragation.WIN_TITLE);
 	//Initializes the Console variables
 	CMD_CHAR_DATA.cbSize = sizeof(CONSOLE_FONT_INFOEX); //Setting size of struct
 	GetWindowRect(DESKTOP_WIN_HANDLE, &DESKTOP_WIN_RECT);
 	GetCurrentConsoleFontEx(CMD_OUTPUT_OBJ_HANDLE, FALSE, &CMD_CHAR_DATA);
 
-	std::fill_n(_win_data.data(), _win_data.max_size(), ' ');
-	if (is_console_utf_)
+	std::fill_n(_winData.Data(), _winData.MaxSize(), ' ');
+	if (isConsolUtf)
 	{
 		_setmode(_fileno(stdout), _O_U16TEXT);
 	}
-	_current_settings = configuragation;
-	init_console();
-	draw_window_border(_current_settings.WIN_BORDER);
+	_currentSettings = configuragation;
+	_InitConsole();
+	_DrawWindowBorder(_currentSettings.WIN_BORDER);
 }
 
-void Lit::Window::set_framerate_limit(const size_t limit)
+void Lit::Window::SetFramerateLimit(const size_t limit)
 {
-	_fps_limit = limit;
+	_fpsCap = limit;
 }
 
-void Lit::Window::clear()
+void Lit::Window::Clear()
 {
-	std::fill_n(_win_data.data(), _win_data.max_size() / 2, ' ');
+	std::fill_n(_winData.Data(), _winData.MaxSize() / 2, ' ');
 }
 
-void Lit::Window::fill(const wchar_t character)
+void Lit::Window::Fill(const wchar_t character)
 {
-	std::fill_n(_win_data.data(), _win_data.max_size() / 2, character);
+	std::fill_n(_winData.Data(), _winData.MaxSize() / 2, character);
 }
 
-void Lit::Window::fill(const wchar_t character,
-	const Arn::Vector2<size_t> top_left,
-	const Arn::Vector2<size_t> bottom_right)
+void Lit::Window::Fill(const wchar_t character,
+	const Arn::Vector2<size_t> topLeft,
+	const Arn::Vector2<size_t> bottomRight)
 {
-	for (size_t height{ 0 }; height < bottom_right.y - top_left.y; ++height)
+	for (size_t height{ 0 }; height < bottomRight.y - topLeft.y; ++height)
 	{
-		std::fill_n(&_win_data.at({ top_left.x, top_left.y + height }), bottom_right.x - top_left.x, character);
+		std::fill_n(&_winData.At({ topLeft.x, topLeft.y + height }), bottomRight.x - topLeft.x, character);
 	}
 }
 
-void Lit::Window::fill(wchar_t character, Lit::Rect<size_t> rect)
+void Lit::Window::Fill(wchar_t character, Lit::Rect<size_t> rect)
 {
 	for (size_t height{ 0 }; height < rect.height - rect.top; ++height)
 	{
-		std::fill_n(&_win_data.at({ rect.left, rect.top + height }), rect.width - rect.left, character);
+		std::fill_n(&_winData.At({ rect.left, rect.top + height }), rect.width - rect.left, character);
 	}
 }
 
-void Lit::Window::clear_cmd()
+void Lit::Window::ClearCMD()
 {
 	constexpr COORD top_left = { 0, 0 };
 	DWORD written;
@@ -218,88 +221,91 @@ void Lit::Window::clear_cmd()
 	SetConsoleCursorPosition(CMD_OUTPUT_OBJ_HANDLE, top_left);
 }
 
-void Lit::Window::move(Arn::Vector2<float> offset)
+void Lit::Window::MoveView(Arn::Vector2<float> offset)
 {
-	_view_pos = { _view_pos.x + offset.x,
-				  _view_pos.y + offset.y };
+	_viewPos = { _viewPos.x + offset.x,
+				  _viewPos.y + offset.y };
 }
 
-void Lit::Window::draw(Drawable& drawable)
+void Lit::Window::Draw(Drawable& drawable)
 {
-	Arn::Vector2<int> cast_drawable_pos{ floor(drawable._pos.x),floor(drawable._pos.y) };
-	Arn::Vector2<int> cast_view_pos{ floor(_view_pos.x),floor(_view_pos.y) };
-	if (cast_drawable_pos.x >= cast_view_pos.x + static_cast<int>(WIDTH)
-		|| cast_drawable_pos.y >= cast_view_pos.y + static_cast<int>(HEIGHT)
-		|| cast_drawable_pos.x + static_cast<int>(drawable._display_rect.width) <= cast_view_pos.x
-		|| cast_drawable_pos.y + static_cast<int>(drawable._display_rect.height) <= cast_view_pos.y)
+	using namespace Arn;
+
+	Arn::Vector2<int> drawablePos{ TCast<int>(floor(drawable._pos.x)),TCast<int>(floor(drawable._pos.y)) };
+	Arn::Vector2<int> viewPos{ TCast<int>(floor(_viewPos.x)),TCast<int>(floor(_viewPos.y)) };
+	if (drawablePos.x >= viewPos.x + TCast<int>(_width)
+		|| drawablePos.y >= viewPos.y + TCast<int>(_height)
+		|| drawablePos.x + TCast<int>(drawable._displayRect.width) <= viewPos.x
+		|| drawablePos.y + TCast<int>(drawable._displayRect.height) <= viewPos.y)
 	{
 		return;
 	}
 
-	size_t new_size_y{
-		cast_drawable_pos.y + static_cast<int>(drawable._display_rect.height) > cast_drawable_pos.y + static_cast<int>(HEIGHT) ?
-		(cast_view_pos.y + static_cast<int>(HEIGHT)) - cast_drawable_pos.y :
-		drawable._display_rect.height };
+	size_t newSizeY{
+		drawablePos.y + TCast<int>(drawable._displayRect.height) > drawablePos.y + TCast<int>(_height) ?
+		(viewPos.y + TCast<int>(_height)) - drawablePos.y :
+		drawable._displayRect.height };
 
-	size_t new_size_x{
-	   drawable._pos.x + static_cast<int>(drawable._display_rect.width) > cast_view_pos.x + static_cast<int>(WIDTH) ?
-	   (cast_view_pos.x + static_cast<int>(WIDTH)) - cast_drawable_pos.x :
-	   drawable._display_rect.width };
+	size_t newSizeX{
+	   drawable._pos.x + TCast<int>(drawable._displayRect.width) > viewPos.x + TCast<int>(_width) ?
+	   (viewPos.x + TCast<int>(_width)) - drawablePos.x :
+	   drawable._displayRect.width };
 
-	size_t begin_drawing_x{
-		cast_view_pos.x > cast_drawable_pos.x ?
-		static_cast<size_t>(cast_view_pos.x) - cast_drawable_pos.x :
+	size_t beginDrawingX{
+		viewPos.x > drawablePos.x ?
+		TCast<size_t>(viewPos.x) - drawablePos.x :
 		0 };
 
-	size_t begin_drawing_y{
-		cast_view_pos.y > cast_drawable_pos.y ?
-		static_cast<size_t>(cast_view_pos.y) - cast_drawable_pos.y :
+	size_t beginDrawingY{
+		viewPos.y > drawablePos.y ?
+		TCast<size_t>(viewPos.y) - drawablePos.y :
 		0 };
 
-	size_t abs_pos_x{ cast_view_pos.x > cast_drawable_pos.x ?
+	size_t posAbsX{ viewPos.x > drawablePos.x ?
 		0 :
-		static_cast<size_t>(cast_drawable_pos.x) - cast_view_pos.x };
+		TCast<size_t>(drawablePos.x) - viewPos.x };
 
-	size_t abs_pos_y{ cast_view_pos.y > cast_drawable_pos.y ?
+	size_t posAbsY{ viewPos.y > drawablePos.y ?
 		0 :
-		static_cast<size_t>(cast_drawable_pos.y) - cast_view_pos.y };
+		TCast<size_t>(drawablePos.y) - viewPos.y };
 
-	for (size_t y{ begin_drawing_y }, index{ 0 }; y < new_size_y; ++y, ++index) {
+	for (size_t y{ beginDrawingY }, index{ 0 }; y < newSizeY; ++y, ++index) {
 		// x2 because memcpy copies in bytes and wchar is 2 bytes
 		std::memcpy(
-			&_win_data.at({ abs_pos_x, abs_pos_y + index }),
-			&drawable._draw_data.at({ drawable._display_rect.left + begin_drawing_x ,y }),
-			(new_size_x - begin_drawing_x) * sizeof(wchar_t));
+			&_winData.At({ posAbsX, posAbsY + index }),
+			&drawable._drawData.At({ drawable._displayRect.left + beginDrawingX ,y }),
+			(newSizeX - beginDrawingX) * sizeof(wchar_t));
 	}
 }
 
-void Lit::Window::display()
+void Lit::Window::Display()
 {
-	const float current_time = _internal_clock.get_elapsed_time().as_seconds();
-	const float fps_frequency = 1 / static_cast<float>(_fps_limit);
+	const float current_time = _internalClock.GetElapsedTime().Seconds();
+	const float fps_frequency = 1 / Arn::TCast<float>(_fpsCap);
 	const float pure_duration_milliseconds = fps_frequency - current_time;
 	const float pure_duration = pure_duration_milliseconds * 1000;
 	const int duration = static_cast<int>(pure_duration);
 	const DWORD duration_dword = duration;
 
-	if (_fps_limit && current_time < fps_frequency)
+	if (_fpsCap && current_time < fps_frequency)
 	{
-		Sleep(duration_dword);
+		return;
 	}
-	for (size_t y{ 0 }; y < HEIGHT; ++y)
+
+	for (size_t y{ 0 }; y < _height; ++y)
 	{
-		for (size_t x{ 0 }; x < WIDTH; ++x)
+		for (size_t x{ 0 }; x < _width; ++x)
 		{
 			//Treating latter half of the array as a 2nd buffer, to reduce print calls
-			if (_win_data.at({ x, y }) == _win_data.at({ x, HEIGHT + y }))
+			if (_winData.At({ x, y }) == _winData.At({ x, _height + y }))
 			{
 				continue;
 			}
-			set_cursor_position_in_window({ static_cast<short>(x), static_cast<short>(y) });
-			fwrite(&_win_data.at({ x, y }), sizeof(wchar_t), 1, stdout);
+			SetCursorPos({ static_cast<short>(x), static_cast<short>(y) });
+			std::fwrite(&_winData.At({ x, y }), sizeof(wchar_t), 1, stdout);
 		}
 	}
-	std::wmemmove(&_win_data.at({ 0, HEIGHT }), &_win_data.at({ 0, 0 }), _win_data.max_size() / 2);
-	set_cursor_position_abs({ 0, static_cast<short>(HEIGHT + 3) });
-	_internal_clock.restart();
+	std::wmemmove(&_winData.At({ 0, _height }), &_winData.At({ 0, 0 }), _winData.MaxSize() / 2);
+	SetCursorAbsPos({ 0, static_cast<short>(_height + 3) });
+	_internalClock.Restart();
 }

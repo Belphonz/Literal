@@ -3,9 +3,8 @@
 
 #include <string>
 
-#include "Arson/Tensor2D.h"
-#include "Arson/Struct_Common.h"
-#include "Literal/Rect.h"
+#include <Arson/Arson.h>
+#include <Literal/Rect.h>
 
 namespace Lit
 {
@@ -15,60 +14,58 @@ namespace Lit
 	protected:
 		Arn::Vector2<size_t> _size{};
 		//Holds the rectangle which is displayed onto the Window
-		Lit::Rect<size_t> _display_rect{};
+		Lit::Rect<size_t> _displayRect{};
 		//Holds the current view position of the top left char
 		Arn::Vector2<float> _pos{ 0, 0 };
 		//Main Array storing the Drawable
-		Arn::Tensor2D<wchar_t> _draw_data{ {_size.x,_size.y} };
+		Arn::Tensor2DVector<wchar_t> _drawData{ {_size.x,_size.y},true };
 
 		friend class Window;
 	public:
 		Drawable(Arn::Vector2<size_t> size, Arn::Vector2<float> posistion = { 0,0 });
-		Drawable(const std::string& filepath,
+		Drawable(const std::wstring& filepath,
 			Arn::Vector2<size_t> size,
 			Arn::Vector2<float> posistion = { 0,0 });
 		//Copy Constructor
-		Drawable(const Drawable& delta_drawable);
+		Drawable(const Drawable& deltaDrawable);
 		//Move Constructor
-		Drawable(Drawable&& delta_drawable) noexcept;
+		Drawable(Drawable&& deltaDrawable) noexcept;
 		//Copy assignment
-		Drawable& operator=(const Drawable& delta_drawable);
+		Drawable& operator=(const Drawable& deltaDrawable);
 		//Move assignment
-		Drawable& operator=(Drawable&& delta_drawable) noexcept;
+		Drawable& operator=(Drawable&& deltaDrawable) noexcept;
 
 		//Sets a 2D array as the draw_data
-		void set_drawable(Arn::Tensor2D<wchar_t> array2D);
+		void SetDrawable(Arn::Tensor2DVector<wchar_t> array2D);
 		//Sets the contents of a txt file as the draw_data
-		void set_drawable(const std::string& filepath);
+		void SetDrawable(const std::wstring& filepath);
 		//Gets Drawables Position
-		Arn::Vector2<float> position() const;
+		Arn::Vector2<float> Pos() const;
 		//Sets Drawables Position
-		void set_position(Arn::Vector2<float> new_pos);
+		void SetPos(Arn::Vector2<float> newPos);
 		//Gets Drawables Size
-		Arn::Vector2<size_t> size() const;
-		//Sets Drawables Size
-		void set_size(Arn::Vector2<size_t> new_size);
+		Arn::Vector2<size_t> Size() const;
 		//Gets Drawables draw_rect
 		//(Draw Rect is the surface which is drawn on the Window)
 		//(By default this is set to the whole Drawable and is reset at every resize)
-		Lit::Rect<size_t> get_display_surface();
+		Lit::Rect<size_t> GetRect();
 		//Gets Drawables draw_rect
 		//(Draw Rect is the surface which is drawn on the Window)
 		//(By default this is set to the whole Drawable and is reset at every resize)
-		void set_display_surface(Lit::Rect<size_t> new_draw_rect);
+		void SetDisplaySurface(Lit::Rect<size_t> newDrawRect);
 		//Get Raw Drawable Array
-		const Arn::Tensor2D<wchar_t>& data();
+		const Arn::Tensor2DVector<wchar_t>& Data();
 		//Get Primitive Raw Drawable Array
-		wchar_t* rawdata();
+		wchar_t* RawData();
 
 		//Displaces the position by offset
-		void move(Arn::Vector2<float> offset);
+		void Move(Arn::Vector2<float> offset);
 		//Fill the drawable with a char
-		void fill(wchar_t character);
+		void Fill(wchar_t character);
 		//Fill a part of the drawable with a char
-		void fill(wchar_t character, Arn::Vector2<size_t> top_left, Arn::Vector2<size_t> bottom_right);
+		void Fill(wchar_t character, Arn::Vector2<size_t> topLeft, Arn::Vector2<size_t> bottomRight);
 		//Fill a part of the drawable with a char
-		void fill(wchar_t character, Lit::Rect<size_t> rect);
+		void Fill(wchar_t character, Lit::Rect<size_t> rect);
 	};
 }
 

@@ -1,7 +1,7 @@
 #ifndef LITERAL_STRUCT_WINDOW_H
 #define LITERAL_STRUCT_WINDOW_H
 
-#include "Arson/Struct_Common.h"
+#include <Arson/Common.h>
 
 namespace Lit {
 	//Object which holds a 2D rectangle structure
